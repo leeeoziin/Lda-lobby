@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>LDA Lobby Premium</title>
+
+<style>
+body {
+  margin: 0;
+  font-family: Arial;
+  background: #0f172a;
+  color: white;
+}
+
+header {
+  background: #1e293b;
+  padding: 20px;
+  text-align: center;
+}
+
+h1 {
+  color: #facc15;
+}
+
+.container {
+  padding: 20px;
+}
+
+.card {
+  background: #1e293b;
+  padding: 15px;
+  border-radius: 10px;
+  margin-bottom: 20px;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+th, td {
+  padding: 10px;
+  text-align: center;
+}
+
+th {
+  color: #aaa;
+}
+
+.top1 { color: #facc15; }
+.top2 { color: #ccc; }
+.top3 { color: #cd7f32; }
+
+button {
+  background: #3b82f6;
+  border: none;
+  padding: 10px;
+  color: white;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+input {
+  margin: 3px;
+  padding: 5px;
+  width: 60px;
+}
+</style>
+</head>
+
+<body>
+
+<header>
+  <h1>LDA Lobby Premium</h1>
+  <p>Ranking Competitivo</p>
+</header>
+
+<div class="container">
+
+<div class="card">
+<h2>🏆 Ranking</h2>
+<table id="ranking"></table>
+</div>
+
+<div class="card">
+<h2>🔒 Painel Admin</h2>
+
+<input type="password" id="senha" placeholder="Senha">
+<button onclick="login()">Entrar</button>
+
+<div id="admin" style="display:none;">
+  <h3>Editar Jogadores</h3>
+  <div id="editor"></div>
+  <button onclick="salvar()">Salvar Alterações</button>
+</div>
+
+</div>
+
+</div>
+
+<script>
+
+const senhaCorreta = "LOBBYLDA00";
+
+let jogadores = [
+{nome:"oTeoria", partidas:5, kills:74, assists:17, mortes:41},
+{nome:"zKxStar", partidas:5, kills:59, assists:15, mortes:46},
+{nome:"iKLuzioNXz", partidas:4, kills:44, assists:11, mortes:35},
+{nome:"barbosalhppp", partidas:4, kills:39, assists:4, mortes:38},
+{nome:"zPinicoxStar", partidas:4, kills:37, assists:7, mortes:28},
+{nome:"IIIIIIII2531", partidas:3, kills:35, assists:7, mortes:21},
+{nome:"zProdigyz7", partidas:3, kills:30, assists:6, mortes:27},
+{nome:"xVidalzera", partidas:2, kills:20, assists:4, mortes:19},
+{nome:"AlasTor3279", partidas:3, kills:19, assists:9, mortes:26},
+{nome:"Gunner I R6", partidas:3, kills:18, assists:6, mortes:27},
+{nome:"vxsco1", partidas:3, kills:17, assists:10, mortes:32},
+{nome:"zPandaxStar", partidas:3, kills:15, assists:8, mortes:29},
+{nome:"YxF tidierzinho", partidas:2, kills:14, assists:4, mortes:20},
+{nome:"itzOInook", partidas:1, kills:13, assists:1, mortes:11},
+{nome:"BRXRZ", partidas:5, kills:12, assists:5, mortes:20},
+{nome:"iWolfxZz", partidas:1, kills:11, assists:4, mortes:5},
+{nome:"yWeiixStar", partidas:2, kills:11, assists:5, mortes:19},
+{nome:"PomboDoBeco", partidas:1, kills:9, assists:2, mortes:6},
+{nome:"GodMakz", partidas:1, kills:9, assists:3, mortes:6},
+{nome:"SooX is LT", partidas:1, kills:9, assists:4, mortes:10},
+{nome:"Nixz karma", partidas:1, kills:8, assists:1, mortes:7},
+{nome:"FLUUP22", partidas:1, kills:7, assists:1, mortes:8},
+{nome:"MTO VSpro", partidas:1, kills:5, assists:2, mortes:10},
+{nome:"yzcjx", partidas:1, kills:3, assists:0, mortes:7},
+{nome:"iNs Flastry", partidas:1, kills:2, assists:2, mortes:8},
+{nome:"zSiriosxStar", partidas:1, kills:1, assists:1, mortes:10}
+];
+
+function calcular() {
+  jogadores.forEach(j => {
+    j.kd = (j.kills / j.mortes).toFixed(2);
+    j.pontos = j.partidas * 3;
+  });
+
+  jogadores.sort((a,b)=> b.pontos - a.pontos || b.kd - a.kd);
+}
+
+function render() {
+  calcular();
+
+  let html = `
+  <tr>
+    <th>#</th>
+    <th>Nome</th>
+    <th>Partidas</th>
+    <th>Kills</th>
+    <th>Assist</th>
+    <th>Mortes</th>
+    <th>K/D</th>
+    <th>Pontos</th>
+  </tr>`;
+
+  jogadores.forEach((j,i)=>{
+    let cls = i==0?"top1":i==1?"top2":i==2?"top3":"";
+    html += `
+    <tr class="${cls}">
+      <td>${i+1}</td>
+      <td>${j.nome}</td>
+      <td>${j.partidas}</td>
+      <td>${j.kills}</td>
+      <td>${j.assists}</td>
+      <td>${j.mortes}</td>
+      <td>${j.kd}</td>
+      <td>${j.pontos}</td>
+    </tr>`;
+  });
+
+  document.getElementById("ranking").innerHTML = html;
+}
+
+function login(){
+  if(document.getElementById("senha").value === senhaCorreta){
+    document.getElementById("admin").style.display = "block";
+    renderEditor();
+  } else {
+    alert("Senha incorreta");
+  }
+}
+
+function renderEditor(){
+  let html = "";
+  jogadores.forEach((j,i)=>{
+    html += `
+    <div>
+      ${j.nome}
+      P:<input value="${j.partidas}" onchange="jogadores[${i}].partidas=this.value">
+      K:<input value="${j.kills}" onchange="jogadores[${i}].kills=this.value">
+      A:<input value="${j.assists}" onchange="jogadores[${i}].assists=this.value">
+      D:<input value="${j.mortes}" onchange="jogadores[${i}].mortes=this.value">
+    </div>`;
+  });
+  document.getElementById("editor").innerHTML = html;
+}
+
+function salvar(){
+  render();
+  alert("Dados atualizados!");
+}
+
+render();
+
+</script>
+
+</body>
+</html>
